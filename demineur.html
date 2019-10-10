@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<title>Démineur</title>
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet/less" type="text/css" href="styles.less">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/less.js/3.9.0/less.min.js" ></script>
+</head>
+
+<body>
+
+<script>
+    function Demineur() {
+    nbrLignes = document.forms["regles"]["lignes"].value;
+    nbrColonnes = document.forms["regles"]["colonnes"].value;
+    table = document.getElementById("demineur");
+    table.innerHTML = "";
+    var listeMine = document.getElementById("listeMine");
+    listeMine.innerHTML = "";
+
+    for (var i=0; i < nbrLignes; i++)
+		{
+      var row = table.insertRow(i);
+        for (var j=0; j < nbrColonnes; j++)
+				{
+          var cell = row.insertCell(j);
+          cell.setAttribute("mine","false");
+          cell.onclick = function() {
+          DemineurClick(this) ;
+             }
+        }
+    }
+    var nbrMines = document.forms["regles"]["nbrMines"].value;
+    for(var m=0 ; m < nbrMines; m++) {
+        var rowMine = Math.floor(Math.random() * nbrLignes);
+        var cellMine = Math.floor(Math.random() *nbrColonnes);
+        var mine = table.rows[rowMine].cells[cellMine];
+
+        mine.setAttribute("mine","true");
+
+    }
+   return false;
+}
+    function DemineurClick(cell) {
+        var mine = cell.getAttribute("mine")
+
+        if(mine == "true") {
+          alert("GAME OVER")
+          Demineur();
+        }
+       if(mine == "false") {
+           var nbrMinesAdj = 0;
+           var cellLigne = cell.parentNode.rowIndex;
+           var cellColonne = cell.cellIndex;
+
+           for (var i = Math.max(cellLigne - 1, 0); i <= Math.min(cellLigne + 1, nbrLignes-1); i++) {
+            for(var j = Math.max(cellColonne - 1, 0); j <= Math.min(cellColonne + 1, nbrColonnes-1); j++) {
+		        if (table.rows[i].cells[j].getAttribute("mine")=="true") { nbrMinesAdj++}
+            }
+           }
+           cell.innerHTML = nbrMinesAdj;
+
+       }
+    }
+</script>
+
+<h1>Démineur</h1>
+
+<form  name="regles" method="POST" onsubmit="return Demineur()" class="formulaire">
+    <p>
+        <label for="lignes">Nombres de lignes: </label>
+        <input type="number" name="lignes">
+    </p>
+    <p>
+        <label for="colonnes">Nombres de colonnes: </label>
+        <input type="number" name="colonnes">
+    </p>
+    <p>
+        <label for="nbrMines">Nombres de bombes: </label>
+        <input type="number" name="nbrMines">
+    </p>
+        <input type="submit" value="Envoyer">
+</form>
+
+<p id="listeMine"></p>
+
+<table class="demineur" id="demineur"></table>
+
+
+</body>
+</html>
